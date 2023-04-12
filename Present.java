@@ -1,3 +1,6 @@
+// Online Java Compiler
+// Use this editor to write, compile and run your Java code online
+
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.io.*;
@@ -10,8 +13,24 @@ public class Present implements Runnable{
     // Variables for thraeds
     private String name;
     private static Set<String> globalSet = new ConcurrentSkipListSet<>();
-
+    private static List<Integer> listy = new ArrayList<>();
+    private static boolean filled = false;
     private static ReentrantLock lock = new ReentrantLock(true);
+    
+    public void fill() {
+    lock.lock();
+    try {
+        for (int i = 1; i <= 10; i++) {
+            listy.add(i);
+        }
+        //Collections.shuffle(listy);
+        filled = true;
+    } finally {
+        lock.unlock();
+    }
+}
+    
+    
     
     
     
@@ -25,13 +44,42 @@ public class Present implements Runnable{
     // Runs accessMaze
     public void run()
     {
-      
-      problem1();
-      
+        
+    
+        lock.lock();
+        try {
+            if (!filled) 
+            {
+                fill();
+                System.out.println("Filled up" + this.name);
+                
+            } else 
+            {
+                System.out.println("Already been filled" + this.name);
+            }
+            problem1();
+        } 
+        finally {
+            lock.unlock();
+        }
     }
 
     private void problem1()
     {
+        if(name.equals("Gon Freecss"))
+        {
+            listy.remove(1);
+            System.out.println("Removed 1" + listy.toString());
+        }
+        else
+        {
+            System.out.println("List" + listy.toString());
+        }
+        
+        while(true && globalSet.size() <= 10)
+        {
+            if(lock.try)
+        }
         return;
     }
     
@@ -52,20 +100,20 @@ public class Present implements Runnable{
       // Create eight threads and start them.
 
       // Thread 1
-      Present m1 = new Locky("Eren Yeager");
+      Present m1 = new Present("Eren Yeager");
       Thread my1 = new Thread(m1);
       
       // Thread 2
-      Present m2 = new Locky("Itachi Uchiha");
+      Present m2 = new Present("Itachi Uchiha");
       Thread my2 = new Thread(m2);
       
 
       // Thread 3
-      Present m3 = new Locky("Gon Freecss");
+      Present m3 = new Present("Gon Freecss");
       Thread my3 = new Thread(m3);
 
       // Thread 4
-      Present m4 = new Locky("Killua Zoldyck");
+      Present m4 = new Present("Killua Zoldyck");
       Thread my4 = new Thread(m4);
 
       

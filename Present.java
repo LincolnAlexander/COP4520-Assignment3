@@ -78,7 +78,52 @@ public class Present implements Runnable{
         
         while(true && globalSet.size() <= 10)
         {
-            if(lock.try)
+            if(lock.tryLock())
+            {
+                try
+                {
+                    if(globalSet.size() <= 10)
+                    {
+                        System.out.println("" + name + " has aquired the holy lock");
+                        Random rand = new Random();
+                        int randomNumber = listy.remove(rand.nextInt(10));
+                        while(listy.contains(randomNumber))
+                        {
+                            randomNumber = rand.nextInt(10) + 1;
+                        }
+                        globalSet.add(randomNumber)
+                        
+                    }
+                    else
+                    {
+                        break;
+                    }
+                    
+                    
+                }
+                finally
+                {
+                    // Release the lock when done
+                    System.out.println("" + name + " has released the lock");
+                    lock.unlock();
+                    
+                }
+                
+            }
+            else 
+            {
+            // The lock is already held by another thread, so wait for a bit before trying again 
+                try 
+                {
+                  // Make sure other threads have a chance
+                  Thread.sleep(0);
+                    
+                } 
+                catch (InterruptedException e) 
+                {
+                  // Handle the exception
+                }
+            }
         }
         return;
     }
@@ -95,7 +140,7 @@ public class Present implements Runnable{
       long start = System.currentTimeMillis();
       long end;
        
-      System.out.println("Check primes.txt");
+      System.out.println("Check primes.txt\n");
 
       // Create eight threads and start them.
 

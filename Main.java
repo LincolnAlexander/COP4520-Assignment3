@@ -15,7 +15,6 @@ public class Present implements Runnable{
     private static Set<Integer> globalSet = new ConcurrentSkipListSet<>();
     private static LinkedList<Integer> listy = new LinkedList<>();
     private static boolean filled = false;
-    private static final CountDownLatch latch = new CountDownLatch(4);
     private static ReentrantLock lock = new ReentrantLock(true);
     
     public void fill() {
@@ -71,13 +70,13 @@ public class Present implements Runnable{
         System.out.println("List" + listy.toString());
         
         
-        while(true && globalSet.size() <= 10 )
+        while(globalSet.size() <= 10 )
         {
             if(lock.tryLock())
             {
                 try
                 {
-                    if(globalSet.size() <= 10 && !listy.isEmpty())
+                    if(!listy.isEmpty())
                     {
                         System.out.println("" + name + " has aquired the holy lock");
                         Random rand = new Random();
@@ -85,13 +84,11 @@ public class Present implements Runnable{
                         
                         globalSet.add(randomNumber);
                          System.out.println("" + name + " has added number: "+randomNumber);
-                         break;
+                         
+                         
                         
                     }
-                    else
-                    {
-                        break;
-                    }
+                    break;
                     
                     
                 }

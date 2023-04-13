@@ -15,8 +15,8 @@ public class Present implements Runnable{
     private static Set<Integer> globalSet = new ConcurrentSkipListSet<>();
     private static LinkedList<Integer> listy = new LinkedList<>();
     private static boolean filled = false;
-    private static final CountDownLatch latch = new CountDownLatch(4);
     private static ReentrantLock lock = new ReentrantLock(true);
+    private static Condition condition = lock.newCondition();
     
     public void fill() {
     lock.lock();
@@ -24,7 +24,7 @@ public class Present implements Runnable{
         for (int i = 1; i <= 10; i++) {
             listy.add(i);
         }
-        //Collections.shuffle(listy);
+        Collections.shuffle(listy);
         filled = true;
     } finally {
         lock.unlock();
@@ -42,76 +42,72 @@ public class Present implements Runnable{
       
       
     }
-    // Runs accessMaze
-    public void run()
-    {
-        
     
-        lock.lock();
-        try {
-            if (!filled) 
+     public void run()
+    {
+        while (globalSet.size() < 10) 
+        {
+            lock.lock();
+            try 
             {
-                fill();
-                System.out.println("Filled up" + this.name);
-                
-            } else 
+                if (!filled) 
+                {
+                    fill();
+                    
+                } 
+            } 
+            finally 
             {
-                System.out.println("Already been filled" + this.name);
+                lock.unlock();
             }
             problem1();
-        } 
-        finally {
-            lock.unlock();
         }
+    }
+    
+    // Simulates writing note, and then adds gift to ordered list.
+    private void writeThankYouNote(int x)
+    {
+        globalSet.add(x);
+        System.out.println("" + name + " has tagged gift number: "+x + " and it has been added to the list!");
+        
     }
 
     private void problem1()
     {
-        
-        System.out.println("List" + listy.toString());
-        
-        
-        while(true && globalSet.size() <= 10 )
-        {
+        while(globalSet.size() < 10) {
             if(lock.tryLock())
             {
                 try
                 {
-                    if(globalSet.size() <= 10 && !listy.isEmpty())
+                    if(globalSet.size() < 10 && !listy.isEmpty())
                     {
-                        System.out.println("" + name + " has aquired the holy lock");
-                        Random rand = new Random();
+                        System.out.println("" + name + " has acquired the lock");
+                        
+                        // Get gift from bag and then write thank you note
                         int randomNumber = listy.pop();
-                        
-                        globalSet.add(randomNumber);
-                         System.out.println("" + name + " has added number: "+randomNumber);
-                         break;
+                        writeThankYouNote(randomNumber);
                         
                     }
-                    else
-                    {
-                        break;
-                    }
-                    
-                    
+                    Thread.sleep(3);
+                }
+                catch (InterruptedException e) {
+                  // Handle the exception
                 }
                 finally
                 {
                     // Release the lock when done
                     System.out.println("" + name + " has released the lock");
                     lock.unlock();
-                    
                 }
-                
+                // Allow another thread to acquire the lock
+                Thread.yield();
             }
             else 
             {
-            // The lock is already held by another thread, so wait for a bit before trying again 
+                // The lock is already held by another thread, so wait for a bit before trying again 
                 try 
                 {
-                  // Make sure other threads have a chance
                   Thread.sleep(0);
-                    
                 } 
                 catch (InterruptedException e) 
                 {
@@ -119,14 +115,8 @@ public class Present implements Runnable{
                 }
             }
         }
-        return;
     }
-    
 
-    
-
-    
-    
   
     public static void main(String[] args) 
     {
@@ -183,6 +173,7 @@ public class Present implements Runnable{
       end = System.currentTimeMillis();
       
       // Create primes.txt and write neccessary info ot it.
+      System.out.println(globalSet.toString());
       System.out.println("The program finished in " +  (end - start) + "ms\n");
 
     }

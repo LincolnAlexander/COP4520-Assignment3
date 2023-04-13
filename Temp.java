@@ -8,34 +8,17 @@ import java.security.IdentityScope;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.locks.Condition;
 
-public class Main implements Runnable{
+public class Temp implements Runnable
+{
 
     // Variables for thraeds
     private String name;
-    private static Set<Integer> globalSet = new ConcurrentSkipListSet<>();
-    private static LinkedList<Integer> listy = new LinkedList<>();
-    private static boolean filled = false;
+    private static ConcurrentSkipListSet<Integer> globalSet = new ConcurrentSkipListSet<>();
     private static ReentrantLock lock = new ReentrantLock(true);
-    
-    public void fill() {
-    lock.lock();
-    try {
-        for (int i = 1; i <= 10; i++) {
-            listy.add(i);
-        }
-        //Collections.shuffle(listy);
-        filled = true;
-    } finally {
-        lock.unlock();
-    }
-}
-    
-    
-    
-    
-    
+    private static ArrayList<Integer> diffTemps = new ArrayList<>();
+
     // Constructor
-    public Present(String name )
+    public Temp(String name )
     {
       this.name = name;
       
@@ -44,51 +27,38 @@ public class Main implements Runnable{
     // Runs accessMaze
     public void run()
     {
-        
-    
-        lock.lock();
-        try {
-            if (!filled) 
-            {
-                fill();
-                System.out.println("Filled up" + this.name);
-                
-            } else 
-            {
-                System.out.println("Already been filled" + this.name);
-            }
-            problem1();
-        } 
-        finally {
-            lock.unlock();
+        while(globalSet.size() < 60)
+        {
+            problem2();
         }
     }
-
-    private void problem1()
+    private void addTemp()
     {
-        
-        System.out.println("List" + listy.toString());
-        
-        
-        while(globalSet.size() <= 10 )
+        Random r = new Random();
+        int randomNum = r.nextInt(171) - 100;
+        //System.out.println(randomNum);
+        globalSet.add(randomNum);
+
+    }
+    private void problem2()
+    {
+        while(globalSet.size() <= 60)
         {
             if(lock.tryLock())
             {
                 try
                 {
-                    if(!listy.isEmpty())
+                    System.out.println("" + name + " has acquired the lock");
+                    if(globalSet.size() % 10 == 0 && globalSet.size() >= 10)
                     {
-                        System.out.println("" + name + " has aquired the holy lock");
-                        Random rand = new Random();
-                        int randomNumber = listy.pop();
-                        
-                        globalSet.add(randomNumber);
-                         System.out.println("" + name + " has added number: "+randomNumber);
-                         
-                         
-                        
+                        int x = globalSet.first();
+                        int y = globalSet.last();
+                        System.out.println("It has been 10 minutes, largest difference is: " + (y-x) + " y: " + y + " x: " +x);
+                        diffTemps.add(y-x);
+
                     }
-                    break;
+                    addTemp();
+                    
                     
                     
                 }
@@ -136,22 +106,35 @@ public class Main implements Runnable{
       // Create eight threads and start them.
 
       // Thread 1
-      Present m1 = new Present("Eren Yeager");
+      Temp m1 = new Temp("Eren Yeager");
       Thread my1 = new Thread(m1);
       
       // Thread 2
-      Present m2 = new Present("Itachi Uchiha");
+      Temp m2 = new Temp("Itachi Uchiha");
       Thread my2 = new Thread(m2);
       
 
       // Thread 3
-      Present m3 = new Present("Gon Freecss");
+      Temp m3 = new Temp("Gon Freecss");
       Thread my3 = new Thread(m3);
 
       // Thread 4
-      Present m4 = new Present("Killua Zoldyck");
+      Temp m4 = new Temp("Killua Zoldyck");
       Thread my4 = new Thread(m4);
 
+      Temp m5 = new Temp("Miyamoto Musashi");
+      Thread my5 = new Thread(m5);
+      // Thread 6
+      Temp m6 = new Temp("Thorfinn Karlsefni");
+      Thread my6 = new Thread(m6);
+
+      // Thread 7
+      Temp m7 = new Temp("Ken Kaneki");
+      Thread my7 = new Thread(m7);
+      
+      // Thread 8
+      Temp m8 = new Temp("Yuji Itadori");
+      Thread my8 = new Thread(m8);
       
 
       // Start all threads
@@ -159,7 +142,10 @@ public class Main implements Runnable{
       my2.start();
       my3.start();
       my4.start();
-      
+      my5.start();
+      my6.start();
+      my7.start();
+      my8.start();
 
       // After all threads finish run the rest of code, so we can time how long the program takes.
       try
@@ -168,6 +154,10 @@ public class Main implements Runnable{
         my2.join();
         my3.join();
         my4.join();
+        my5.join();
+        my6.join();
+        my7.join();
+        my8.join();
         
       }
       catch(Exception e)

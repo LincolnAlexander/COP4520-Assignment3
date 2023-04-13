@@ -8,7 +8,7 @@ import java.security.IdentityScope;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.locks.Condition;
 
-public class Present implements Runnable{
+public class Main implements Runnable{
 
     // Variables for thraeds
     private String name;

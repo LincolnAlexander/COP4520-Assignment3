@@ -14,26 +14,8 @@ public class Present implements Runnable{
     private String name;
     private static Set<Integer> globalSet = new ConcurrentSkipListSet<>();
     private static LinkedList<Integer> listy = new LinkedList<>();
-    private static boolean filled = false;
     private static ReentrantLock lock = new ReentrantLock(true);
-    private static Condition condition = lock.newCondition();
-    
-    public void fill() {
-    lock.lock();
-    try {
-        for (int i = 1; i <= 10; i++) {
-            listy.add(i);
-        }
-        Collections.shuffle(listy);
-        filled = true;
-    } finally {
-        lock.unlock();
-    }
-}
-    
-    
-    
-    
+
     
     // Constructor
     public Present(String name )
@@ -45,21 +27,8 @@ public class Present implements Runnable{
     
      public void run()
     {
-        while (globalSet.size() < 10) 
+        while (globalSet.size() < 500000) 
         {
-            lock.lock();
-            try 
-            {
-                if (!filled) 
-                {
-                    fill();
-                    
-                } 
-            } 
-            finally 
-            {
-                lock.unlock();
-            }
             problem1();
         }
     }
@@ -68,36 +37,35 @@ public class Present implements Runnable{
     private void writeThankYouNote(int x)
     {
         globalSet.add(x);
-        System.out.println("" + name + " has tagged gift number: "+x + " and it has been added to the list!");
+        //System.out.println("" + name + " has tagged gift number: "+x + " and it has been added to the list!");
         
     }
 
     private void problem1()
     {
-        while(globalSet.size() < 10) {
+        while(globalSet.size() < 500000) {
             if(lock.tryLock())
             {
                 try
                 {
-                    if(globalSet.size() < 10 && !listy.isEmpty())
+                    if(globalSet.size() < 500000 && !listy.isEmpty())
                     {
-                        System.out.println("" + name + " has acquired the lock");
+                       // System.out.println("" + name + " has acquired the lock");
                         
                         // Get gift from bag and then write thank you note
                         int randomNumber = listy.pop();
                         writeThankYouNote(randomNumber);
                         
                     }
-                    Thread.sleep(3);
+                    
                 }
-                catch (InterruptedException e) {
-                  // Handle the exception
-                }
+                
                 finally
                 {
                     // Release the lock when done
-                    System.out.println("" + name + " has released the lock");
+                    //System.out.println("" + name + " has released the lock");
                     lock.unlock();
+                    
                 }
                 // Allow another thread to acquire the lock
                 Thread.yield();
@@ -123,7 +91,7 @@ public class Present implements Runnable{
       // Start Timer
       long start = System.currentTimeMillis();
       long end;
-       
+    
       System.out.println("Check primes.txt\n");
 
       // Create eight threads and start them.
@@ -146,7 +114,11 @@ public class Present implements Runnable{
       Thread my4 = new Thread(m4);
 
       
-
+      for (int i = 1; i <= 500000; i++) 
+      {
+        listy.add(i);
+      }
+      Collections.shuffle(listy); 
       // Start all threads
       my1.start();
       my2.start();
@@ -173,7 +145,7 @@ public class Present implements Runnable{
       end = System.currentTimeMillis();
       
       // Create primes.txt and write neccessary info ot it.
-      System.out.println(globalSet.toString());
+      //System.out.println(globalSet.toString());
       System.out.println("The program finished in " +  (end - start) + "ms\n");
 
     }

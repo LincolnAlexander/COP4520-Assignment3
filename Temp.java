@@ -49,6 +49,7 @@ public class Temp implements Runnable
                 try
                 {
                     System.out.println("" + name + " has acquired the lock");
+                    // If has been 10 minutes then get largest difference
                     if(globalSet.size() % 10 == 0 && globalSet.size() >= 10)
                     {
                         int x = globalSet.first();
@@ -57,6 +58,7 @@ public class Temp implements Runnable
                         diffTemps.add(y-x);
 
                     }
+                    // Add temp to list
                     addTemp();
                     
                     
@@ -101,7 +103,7 @@ public class Temp implements Runnable
       long start = System.currentTimeMillis();
       long end;
        
-      System.out.println("Check primes.txt\n");
+      
 
       // Create eight threads and start them.
 

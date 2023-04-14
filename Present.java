@@ -92,9 +92,9 @@ public class Present implements Runnable{
       long start = System.currentTimeMillis();
       long end;
     
-      System.out.println("Check primes.txt\n");
+      
 
-      // Create eight threads and start them.
+      // Create four threads and start them.
 
       // Thread 1
       Present m1 = new Present("Eren Yeager");
@@ -113,11 +113,13 @@ public class Present implements Runnable{
       Present m4 = new Present("Killua Zoldyck");
       Thread my4 = new Thread(m4);
 
-      
+    
+      // Make list of presents
       for (int i = 1; i <= 500000; i++) 
       {
         listy.add(i);
       }
+      // Shuffle presents, so servants can grab random one.
       Collections.shuffle(listy); 
       // Start all threads
       my1.start();
